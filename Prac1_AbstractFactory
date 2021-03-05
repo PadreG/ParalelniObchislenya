@@ -1,0 +1,170 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[97]:
+
+
+from __future__ import annotations
+from abc import ABC, abstractmethod
+
+
+class AbstractFactory(ABC):
+    """
+    Інтерфейс абстрактної фабрики оголошує набір методів, які повертаються
+    різні абстрактні вироби. Ці продукти називаються сімейними і є
+    пов'язані темою чи концепцією високого рівня. Продукти однієї родини зазвичай є
+    здатні співпрацювати між собою. Сімейство продуктів може мати декілька
+    варіанти, але товари одного варіанту несумісні з продуктами
+    інший.
+    """
+    @abstractmethod
+    def create_product_a(self) -> AbstractProductA:
+        pass
+
+    @abstractmethod
+    def create_product_b(self) -> AbstractProductB:
+        pass
+
+
+class ConcreteFactory1(AbstractFactory):
+    """
+    Бетонні фабрики виробляють сімейство продуктів, що належать до одного
+    варіант. Завод гарантує сумісність отриманих продуктів. Примітка
+    що підписи методів Бетонної фабрики повертають реферат
+    продукту, тоді як всередині методу конкретний виріб інстанціюється.
+    """
+
+    def create_product_a(self) -> AbstractProductA:
+        return ConcreteProductA1()
+
+    def create_product_b(self) -> AbstractProductB:
+        return ConcreteProductB1()
+
+
+class ConcreteFactory2(AbstractFactory):
+    """
+    Кожна бетонна фабрика має відповідний варіант продукту.
+    """
+
+    def create_product_a(self) -> AbstractProductA:
+        return ConcreteProductA2()
+
+    def create_product_b(self) -> AbstractProductB:
+        return ConcreteProductB2()
+
+
+class AbstractProductA(ABC):
+    """
+    Кожен окремий товар із сімейства продуктів повинен мати базовий інтерфейс. Всі
+    Варіанти продукту повинні реалізовувати цей інтерфейс.
+    """
+
+    @abstractmethod
+    def useful_function_a(self) -> str:
+        pass
+
+
+"""
+Бетонні вироби створюються відповідними Бетонними Заводами.
+"""
+
+
+class ConcreteProductA1(AbstractProductA):
+    def useful_function_a(self) -> str:
+        return "Результат продукту А1."
+
+
+class ConcreteProductA2(AbstractProductA):
+    def useful_function_a(self) -> str:
+        return "Результат добутку А2."
+
+
+class AbstractProductB(ABC):
+    """
+    Ось базовий інтерфейс іншого продукту. Всі продукти можуть взаємодіяти
+    один з одним, але належна взаємодія можлива лише між продуктами України
+    той самий конкретний варіант.
+    """
+    @abstractmethod
+    def useful_function_b(self) -> None:
+        """
+        Продукт B здатний робити своє ...
+        """
+        pass
+
+    @abstractmethod
+    def another_useful_function_b(self, collaborator: AbstractProductA) -> None:
+        """
+        ... але він також може співпрацювати з ProductA.
+
+        Анотаційна фабрика гарантує, що вся продукція, яку вона створює, відповідає
+        той самий варіант і, отже, сумісний.
+        """
+        pass
+
+
+"""
+Бетонні вироби створюються відповідними Бетонними Заводами.
+"""
+
+
+class ConcreteProductB1(AbstractProductB):
+    def useful_function_b(self) -> str:
+        return "Результат продукту В1."
+
+    """
+    Варіант, продукт B1, може працювати коректно лише з варіантом,
+    Продукт А1. Тим не менше, він приймає будь-який екземпляр AbstractProductA як
+    аргумент.
+    """
+
+    def another_useful_function_b(self, collaborator: AbstractProductA) -> str:
+        result = collaborator.useful_function_a()
+        return f"Результат співпраці B1 з ({result})"
+
+
+class ConcreteProductB2(AbstractProductB):
+    def useful_function_b(self) -> str:
+        return "Результат продукту В2."
+
+    def another_useful_function_b(self, collaborator: AbstractProductA):
+        """
+        Варіант, продукт B2, може працювати коректно лише з
+        варіант, виріб А2. Тим не менше, він приймає будь-який екземпляр
+        AbstractProductA як аргумент.
+        """
+        result = collaborator.useful_function_a()
+        return f"Результат співпраці B2 з ({result})"
+
+
+def client_code(factory: AbstractFactory) -> None:
+    """
+    Клієнтський код працює з фабриками та продуктами лише за допомогою абстрактних
+    типи: AbstractFactory та AbstractProduct. Це дозволяє проїхати будь-який завод
+    або підклас продукту до коду клієнта, не порушуючи його.
+    """
+    product_a = factory.create_product_a()
+    product_b = factory.create_product_b()
+
+    print(f"{product_b.useful_function_b()}")
+    print(f"{product_b.another_useful_function_b(product_a)}", end="")
+
+
+if __name__ == "__main__":
+    """
+    Клієнтський код може працювати з будь-яким конкретним класом заводу.
+    """
+    print("Клієнт: Тестування коду клієнта з першим заводським типом:")
+    client_code(ConcreteFactory1())
+
+    print("\n")
+
+    print("Клієнт: Тестування того самого коду клієнта з другим заводським типом:")
+    client_code(ConcreteFactory2())
+
+
+# In[ ]:
+
+
+
+
