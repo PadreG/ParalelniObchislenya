@@ -1,0 +1,9 @@
+from threading import Thread
+
+def potic(i):
+    print("Потік %i \n " % i)
+    
+
+for i in range(4):
+    th = Thread(target=potic, args=(i, ))
+    th.start()
